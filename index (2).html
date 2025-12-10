@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ROYAL Hotels - Book Your Stay</title>
+
+<style>
+  body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#f8f8f8;color:#222}
+  .container{max-width:720px;margin:0 auto;background:#fff;padding:0 16px 40px;box-shadow:0 0 12px rgba(0,0,0,.05)}
+  header.header{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #e6e6e6}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo img{height:40px}
+  h2.section-title{color:#1a237e;margin:18px 0 8px}
+  .hero-image{height:220px;background-image:url('home_page.jpg');background-size:cover;background-position:center;border-radius:4px;margin:16px 0}
+  .date-selection{display:flex;gap:12px;margin:14px 0}
+  .date-selection input{flex:1;padding:10px;border-radius:6px;border:1px solid #dcdcdc}
+  .room-card{border:1px solid #e6e6e6;padding:14px;border-radius:8px;margin-bottom:12px}
+  .room-card.selected-room{border:2px solid #1a237e}
+  .room-price-row{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+  .select-btn{background:#f44336;color:#fff;border:0;padding:8px 12px;border-radius:6px;cursor:pointer}
+  .select-btn:hover{opacity:.95}
+  .add-on-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed #eee}
+  .customer-form label{display:block;margin:8px 0 4px;font-weight:600}
+  .customer-form input{width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box}
+  .total-summary{background:#e8eaf6;padding:12px;border-radius:8px;margin-top:14px}
+  .summary-row{display:flex;justify-content:space-between;padding:6px 0}
+  .summary-row.total{font-weight:800;border-top:2px solid #1a237e;padding-top:10px;margin-top:8px}
+  .book-reservation-btn{width:100%;padding:14px;border-radius:8px;border:0;background:#388e3c;color:#fff;font-weight:700;margin-top:18px;cursor:pointer}
+  .book-reservation-btn:disabled{background:#bbb;cursor:not-allowed}
+  /* Styles for the Booking Confirmation Overlay */
+  .processing-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:9999}
+  .processing-box{background:#fff;color:#111;padding:24px;border-radius:10px;max-width:360px;text-align:center}
+  .spinner{width:56px;height:56px;border:8px solid #f3f3f3;border-top:8px solid #1a237e;border-radius:50%;margin:8px auto;animation:spin 1s linear infinite}
+  .spinner.success {border-top-color: #388e3c;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="header">
+    <div class="logo">
+      <img src="https://via.placeholder.com/40x40/1a237e/ffffff?text=R" alt="logo">
+      <div style="font-weight:800;color:#1a237e">ROYAL Hotels</div>
+    </div>
+  </header>
+
+  <div class="hero-image"></div>
+
+  <main>
+    <h2 class="section-title">Select Your Dates</h2>
+    <div class="date-selection">
+      <input type="date" id="check-in-date" />
+      <input type="date" id="check-out-date" />
+    </div>
+    <p id="nights-display" style="font-weight:600">Please select dates to view the final rate.</p>
+
+    <hr>
+
+    <h2 class="section-title">Select a Room Rate</h2>
+
+    <div id="room-selection">
+      <div class="room-card">
+        <h4>Private Suites</h4>
+        <img src="private_suites.jpg" style="width:100%;border-radius:6px;margin:8px 0">
+        <div class="room-price-row">
+          <strong>£150.00 / night</strong>
+          <button class="select-btn" onclick="selectRoom(this,150,'Private Suites')">Select</button>
+        </div>
+      </div>
+
+      <div class="room-card">
+        <h4>Standard Guest Room</h4>
+        <img src="standard_guest_room.jpg" style="width:100%;border-radius:6px;margin:8px 0">
+        <div class="room-price-row">
+          <strong>£250.00 / night</strong>
+          <button class="select-btn" onclick="selectRoom(this,250,'Standard Guest Room')">Select</button>
+        </div>
+      </div>
+
+      <div class="room-card">
+        <h4>Deluxe Executive Room</h4>
+        <img src="deluxe_executive_room.jpg" style="width:100%;border-radius:6px;margin:8px 0">
+        <div class="room-price-row">
+          <strong>£350.00 / night</strong>
+          <button class="select-btn" onclick="selectRoom(this,350,'Deluxe Executive Room')">Select</button>
+        </div>
+      </div>
+
+      <div class="room-card">
+        <h4>Presidential Suites</h4>
+        <img src="presidential_suites.jpg" style="width:100%;border-radius:6px;margin:8px 0">
+        <div class="room-price-row">
+          <strong>£450.00 / night</strong>
+          <button class="select-btn" onclick="selectRoom(this,450,'Presidential Suites')">Select</button>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <h2 class="section-title">Customize Your Stay</h2>
+
+    <div id="add-ons">
+      <div class="add-on-item">
+        <strong>Breakfast & Dinner</strong>
+        <div>
+          <input id="add-breakfast-dinner" type="checkbox" onchange="calculateTotal()"> +£100
+        </div>
+      </div>
+
+      <div class="add-on-item">
+        <strong>Late Check-Out</strong>
+        <div>
+          <input id="add-late-checkout" type="checkbox" onchange="calculateTotal()"> +£40
+        </div>
+      </div>
+
+      <div class="add-on-item">
+        <strong>Traveling with Pet</strong>
+        <div>
+          <input id="add-pets" type="checkbox" onchange="calculateTotal()"> +£70
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <h2 class="section-title">Guest Information</h2>
+
+    <form id="customer-info-form" class="customer-form">
+      <label>Full Name</label>
+      <input id="full-name" required>
+
+      <label>Email Address</label>
+      <input id="email-address" type="email" required>
+
+      <label>Phone Number</label>
+      <input id="phone-number" required>
+
+      <label>Address</label>
+      <input id="address" required>
+
+      <label>ZIP / Postal Code</label>
+      <input id="zip-code" required>
+    </form>
+
+    <hr>
+
+    <h2 class="section-title">Reservation Summary</h2>
+
+    <div class="total-summary">
+      <div class="summary-row"><div>Selected Room Rate:</div><div id="summary-room-rate">£0.00</div></div>
+      <div class="summary-row"><div>Nights:</div><div id="summary-nights">0</div></div>
+      <div class="summary-row"><div>Room Charges:</div><div id="summary-room-charges">£0.00</div></div>
+      <div class="summary-row"><div>Total Add-ons:</div><div id="summary-add-ons">£0.00</div></div>
+      <div class="summary-row total"><div>Total Payment Due:</div><div id="summary-grand-total">£0.00</div></div>
+    </div>
+
+    <button id="book-btn" class="book-reservation-btn" disabled onclick="submitBooking()">Book Reservation & Continue to Payment</button>
+
+  </main>
+</div>
+
+<div id="processing-overlay" class="processing-overlay">
+  <div class="processing-box">
+    <div id="spinner" class="spinner"></div> 
+    <h3 id="processing-title">Processing Booking...</h3>
+    <p id="processing-text">Preparing your confirmation...</p>
+    <pre id="processing-json" style="display:none;background:#f7f7f7;padding:10px;border-radius:6px"></pre>
+  </div>
+</div>
+
+<script>
+/* ————— STATE ————— */
+let selectedRoomPrice = 0;
+let selectedRoomName = "";
+let nights = 0;
+
+const BREAKFAST_DINNER_PRICE = 100;
+const LATE_CHECKOUT_PRICE = 40;
+const PETS_PRICE = 70;
+
+const bookButton = document.getElementById('book-btn');
+const checkInEl = document.getElementById('check-in-date');
+const checkOutEl = document.getElementById('check-out-date');
+const formEl = document.getElementById('customer-info-form');
+const spinnerEl = document.getElementById('spinner'); 
+
+/* ————— INIT ————— */
+document.addEventListener('DOMContentLoaded', () => {
+
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  const minDate = tomorrow.toISOString().split("T")[0];
+
+  checkInEl.min = minDate;
+  checkOutEl.min = minDate;
+
+  checkInEl.addEventListener("change", calculateNights);
+  checkOutEl.addEventListener("change", calculateNights);
+
+  /* Track form changes */
+  ['full-name','email-address','phone-number','address','zip-code']
+    .forEach(id => document.getElementById(id).addEventListener('input', updateBookButtonStatus));
+});
+
+/* ————— FUNCTIONS ————— */
+
+function selectRoom(button, price, name){
+  document.querySelectorAll('.room-card').forEach(c => c.classList.remove('selected-room'));
+  document.querySelectorAll('.select-btn').forEach(b => b.textContent = 'Select');
+
+  button.closest('.room-card').classList.add('selected-room');
+  button.textContent = 'Selected';
+
+  selectedRoomPrice = price;
+  selectedRoomName = name;
+
+  document.getElementById('summary-room-rate').textContent = `£${price.toFixed(2)}`;
+
+  calculateTotal();
+  updateBookButtonStatus();
+}
+
+function calculateNights(){
+  const checkIn = checkInEl.value;
+  const checkOut = checkOutEl.value;
+  const display = document.getElementById('nights-display');
+
+  if(checkIn && checkOut){
+    const d1 = new Date(checkIn);
+    const d2 = new Date(checkOut);
+
+    const diff = d2 - d1;
+
+    if(diff <= 0){
+      nights = 0;
+      display.textContent = "Check-out must be after check-in.";
+    } else {
+      nights = diff / (1000*60*60*24);
+      display.textContent = `Duration: ${nights} Night${nights>1?"s":""}`;
+    }
+  } else {
+    nights = 0;
+    display.textContent = "Please select dates.";
+  }
+
+  calculateTotal();
+  updateBookButtonStatus();
+}
+
+function calculateTotal(){
+  let addOnTotal = 0;
+  if(document.getElementById('add-breakfast-dinner').checked) addOnTotal += BREAKFAST_DINNER_PRICE;
+  if(document.getElementById('add-late-checkout').checked) addOnTotal += LATE_CHECKOUT_PRICE;
+  if(document.getElementById('add-pets').checked) addOnTotal += PETS_PRICE;
+
+  const roomCharges = selectedRoomPrice * nights;
+  const grandTotal = roomCharges + addOnTotal;
+
+  document.getElementById('summary-nights').textContent = nights;
+  document.getElementById('summary-room-charges').textContent = `£${roomCharges.toFixed(2)}`;
+  document.getElementById('summary-add-ons').textContent = `£${addOnTotal.toFixed(2)}`;
+  document.getElementById('summary-grand-total').textContent = `£${grandTotal.toFixed(2)}`;
+  
+  // Return values for saving to localStorage
+  return {
+    roomCharges: roomCharges,
+    addOnTotal: addOnTotal,
+    grandTotal: grandTotal
+  };
+}
+
+function updateBookButtonStatus(){
+  const formValid = formEl.checkValidity();
+  const enabled = selectedRoomPrice > 0 && nights > 0 && formValid;
+  bookButton.disabled = !enabled;
+}
+
+// *** FINALIZED submitBooking FUNCTION WITH localStorage SAVE ***
+function submitBooking(){
+  if(!formEl.checkValidity()){
+    formEl.reportValidity();
+    return;
+  }
+  
+  // Get final totals
+  const totals = calculateTotal();
+  
+  // 1. Construct the new booking object
+  const newBooking = {
+    id: Date.now(), // Unique ID based on timestamp
+    dateCreated: new Date().toLocaleString(),
+    
+    // Customer Info
+    name: document.getElementById('full-name').value,
+    email: document.getElementById('email-address').value,
+    phone: document.getElementById('phone-number').value,
+    address: document.getElementById('address').value,
+    zip: document.getElementById('zip-code').value,
+    
+    // Booking Details
+    checkIn: checkInEl.value,
+    checkOut: checkOutEl.value,
+    nights: nights,
+    room: selectedRoomName,
+    pricePerNight: `£${selectedRoomPrice.toFixed(2)}`,
+    
+    // Charges
+    charges: {
+        roomCharges: `£${totals.roomCharges.toFixed(2)}`,
+        addons: `£${totals.addOnTotal.toFixed(2)}`,
+        grandTotal: `£${totals.grandTotal.toFixed(2)}`
+    },
+    
+    // Add-ons
+    addons: {
+        breakfastDinner: document.getElementById('add-breakfast-dinner').checked ? "Yes" : "No",
+        lateCheckout: document.getElementById('add-late-checkout').checked ? "Yes" : "No",
+        pets: document.getElementById('add-pets').checked ? "Yes" : "No"
+    }
+  };
+  
+  // 2. Load existing bookings from localStorage
+  const existingBookingsJSON = localStorage.getItem('royalHotelBookings');
+  let bookings = existingBookingsJSON ? JSON.parse(existingBookingsJSON) : [];
+  
+  // 3. Add the new booking
+  bookings.push(newBooking);
+  
+  // 4. Save the updated list back to localStorage
+  localStorage.setItem('royalHotelBookings', JSON.stringify(bookings));
+
+  // 5. Show Confirmation Message (UI part)
+  spinnerEl.classList.remove('success');
+  document.getElementById('processing-title').textContent = "Processing Booking...";
+  document.getElementById('processing-text').textContent = "Preparing your confirmation...";
+  document.getElementById('processing-overlay').style.display = "flex";
+
+  setTimeout(() => {
+    spinnerEl.classList.add('success');
+    document.getElementById('processing-title').textContent = "Booking Confirmed! ✅";
+    document.getElementById('processing-text').textContent = "A verification email would be sent to you shortly.";
+    
+    // After a few seconds, optionally clear the form for a new customer
+    setTimeout(() => {
+        formEl.reset(); // Clear form fields
+        // You might want to remove the overlay here, but typically it stays on a real booking site
+        // document.getElementById('processing-overlay').style.display = "none";
+    }, 4000); 
+
+  }, 1500);
+}
+</script>
+
+</body>
+</html>
